@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button";
+import { Metadata } from "next";
 
-export default function Home() {
-	return (
-		<main className="flex min-h-screen flex-col items-center justify-between p-24">
-			<Button>Enviar</Button>
-		</main>
-	);
-}
+import Dashboard from "./(main)/dashboard/page";
+
+export const metadata: Metadata = {
+	title: "Dashboard | pizza.shop",
+};
+
+export default Dashboard;
