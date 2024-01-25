@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
-import { SignInForm } from "./SignInForm";
+import { SignUpForm } from "./SignUpForm";
 
 export const metadata: Metadata = {
-	title: "Login | pizza.shop",
+	title: "Register | pizza.shop",
 };
 
 export default function SignIn() {
-	return <SignInForm />;
+	return <SignUpForm />;
 }

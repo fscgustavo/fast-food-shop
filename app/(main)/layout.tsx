@@ -4,7 +4,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 	return (
 		<section>
 			<h1>Dashboard Layout</h1>
-			{children}
+			<main>{children}</main>
 		</section>
 	);
 }
