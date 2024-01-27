@@ -1,6 +1,6 @@
 import { ArrowRight, Search, X } from "lucide-react";
 
-import { OrderDetails } from "@/components/order-details";
+import { OrderDetails } from "@/app/(main)/orders/order-details";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { TableCell, TableRow } from "@/components/ui/table";
