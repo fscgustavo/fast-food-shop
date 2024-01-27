@@ -7,8 +7,6 @@ export type NavLinkProps = LinkProps & { children: ReactNode };
 export function NavLink(props: NavLinkProps) {
 	const pathname = usePathname();
 
-	console.log({ pathname, href: props.href });
-
 	return (
 		<Link
 			data-current={pathname === props.href}
