@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useFormStatus } from "react-dom";
 import { toast } from "sonner";
 
@@ -11,6 +12,10 @@ import { Label } from "@/components/ui/label";
 import { login } from "./actions";
 
 export function SignInForm() {
+	const searchParams = useSearchParams();
+
+	const defaultEmail = searchParams.get("email") ?? "";
+
 	async function loginAction(formData: FormData) {
 		try {
 			await login(formData);
@@ -47,7 +52,12 @@ export function SignInForm() {
 				<form action={loginAction} className="space-y-4" noValidate>
 					<div className="space-y-2">
 						<Label htmlFor="email">E-mail</Label>
-						<Input id="email" type="email" name="email" />
+						<Input
+							id="email"
+							type="email"
+							name="email"
+							defaultValue={defaultEmail}
+						/>
 					</div>
 					<Button type="submit" className="w-full" disabled={pending}>
 						Access dashboard

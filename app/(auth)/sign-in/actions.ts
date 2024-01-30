@@ -1,12 +1,13 @@
 "use server";
 import { z } from "zod";
 
+import { env } from "@/env";
+
 const signInForm = z.object({
-    email: z.string().email({ message: "Informe um e-mail válido" }),
+    email: z.string().email({ message: "Enter a valid email address" }),
 });
 
 export async function login(formData: FormData) {
-
     const validatedFields = signInForm.safeParse({
         email: formData.get("email"),
     });
@@ -18,7 +19,11 @@ export async function login(formData: FormData) {
         throw new Error(formattedError.email?._errors[0])
     }
 
-
-
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    await fetch(`${env.NEXT_PUBLIC_DOMAIN}/authenticate`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: validatedFields.data.email }),
+    })
 }

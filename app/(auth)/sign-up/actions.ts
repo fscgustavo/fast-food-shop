@@ -1,30 +1,33 @@
 "use server";
 import { z } from "zod";
 
+import { env } from "@/env";
+
 const signInForm = z.object({
     restaurantName: z.string(),
     managerName: z.string(),
     phone: z.string(),
-    email: z.string().email({ message: "Informe um e-mail válido" }),
+    email: z.string().email({ message: "Enter a valid email address" }),
 });
 
 export async function register(formData: FormData) {
 
     const validatedFields = signInForm.safeParse({
-        restaurantName: formData.get("restaurantName"),
-        managerName: formData.get("managerName"),
+        restaurantName: formData.get("restaurant-name"),
+        managerName: formData.get("manager-name"),
         phone: formData.get("phone"),
         email: formData.get("email"),
     });
 
     if (!validatedFields.success) {
-        const formattedError = validatedFields.error.format();
-
-
-        throw new Error(formattedError.email?._errors[0])
+        throw new Error("The form was not filled correctly.")
     }
 
-
-
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    await fetch(`${env.NEXT_PUBLIC_DOMAIN}/restaurants`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(validatedFields.data),
+    })
 }

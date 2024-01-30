@@ -14,14 +14,23 @@ import { register } from "./actions";
 export function SignUpForm() {
 	const router = useRouter();
 
-	async function loginAction(formData: FormData) {
+	async function registerAction(formData: FormData) {
 		try {
 			await register(formData);
 
-			toast.success("Restaurante cadastrado com sucesso!");
-
-			router.push("/login");
-		} catch (error: any) {}
+			toast.success("Restaurant successfully registered!", {
+				action: {
+					label: "Login",
+					onClick: () => {
+						router.push(`/sign-in?email=${formData.get("email")}`);
+					},
+				},
+			});
+		} catch (error: any) {
+			toast.error(
+				"An error occurred while registering the restaurant. Please try again later."
+			);
+		}
 	}
 
 	const { pending } = useFormStatus();
@@ -40,14 +49,14 @@ export function SignUpForm() {
 						Be a partner and start your sales!
 					</p>
 				</div>
-				<form action={loginAction} className="space-y-4" noValidate>
+				<form action={registerAction} className="space-y-4" noValidate>
 					<div className="space-y-2">
 						<Label htmlFor="email">Restaurant Name</Label>
 						<Input id="restaurant-name" name="restaurant-name" />
 					</div>
 					<div className="space-y-2">
 						<Label htmlFor="email">Name</Label>
-						<Input id="name" name="name" />
+						<Input id="name" name="manager-name" />
 					</div>
 					<div className="space-y-2">
 						<Label htmlFor="email">E-mail</Label>
