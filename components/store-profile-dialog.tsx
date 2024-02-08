@@ -1,5 +1,6 @@
 import { useFormStatus } from "react-dom";
 import { toast } from "sonner";
+import { useSWRConfig } from "swr";
 import useSWRImmutable from "swr/immutable";
 
 import {
@@ -22,6 +23,8 @@ import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 
 export function StoreProfileDIalog() {
+	const { mutate } = useSWRConfig();
+
 	const { pending: isUpdatingProfile } = useFormStatus();
 
 	const { data: managedRestaurant } = useSWRImmutable<GetManagedRestaurant>(
@@ -31,7 +34,16 @@ export function StoreProfileDIalog() {
 
 	async function updateProfileAction(formData: FormData) {
 		try {
-			await updateProfile(formData);
+			await mutate("/managed-restaurant", updateProfile(formData), {
+				optimisticData: {
+					...managedRestaurant,
+					name: formData.get("name"),
+					description: formData.get("description"),
+				},
+				rollbackOnError: true,
+				revalidate: false,
+				populateCache: false,
+			});
 
 			toast.success("The profile was successfully updated");
 		} catch (error) {
