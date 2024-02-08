@@ -1,11 +1,14 @@
 import { Building, ChevronDown, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 import useSWRImmutable from "swr/immutable";
+import useSWRMutation from "swr/mutation";
 
 import {
 	GetManagedRestaurant,
 	getManagedRestaurant,
 } from "@/api/get-managed-restaurant";
 import { GetUserProfile, getUserProfile } from "@/api/get-profile";
+import { signOut } from "@/api/sign-out";
 
 import { StoreProfileDIalog } from "./store-profile-dialog";
 import { Button } from "./ui/button";
@@ -21,6 +24,8 @@ import {
 import { Skeleton } from "./ui/skeleton";
 
 export function AccountMenu() {
+	const router = useRouter();
+
 	const { data: profile, isLoading: isLoadingProfile } =
 		useSWRImmutable<GetUserProfile>("/me", getUserProfile);
 
@@ -29,6 +34,16 @@ export function AccountMenu() {
 			"/managed-restaurant",
 			getManagedRestaurant
 		);
+
+	const { trigger: signOutFn, isMutating: isSigningOut } = useSWRMutation(
+		"sign-in",
+		signOut,
+		{
+			onSuccess() {
+				router.replace("/sign-in");
+			},
+		}
+	);
 
 	return (
 		<Dialog>
@@ -69,9 +84,15 @@ export function AccountMenu() {
 							<span>Store&apos;s profile</span>
 						</DropdownMenuItem>
 					</DialogTrigger>
-					<DropdownMenuItem className="text-rose-500 dark:text-rose-400">
-						<LogOut className="h-4 w-4 mr-2" />
-						<span>Log Out</span>
+					<DropdownMenuItem
+						className="text-rose-500 dark:text-rose-400"
+						asChild
+						disabled={isSigningOut}
+					>
+						<button className="w-full" onClick={() => signOutFn()}>
+							<LogOut className="h-4 w-4 mr-2" />
+							<span>Log Out</span>
+						</button>
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
