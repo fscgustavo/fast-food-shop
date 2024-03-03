@@ -10,4 +10,4 @@ export type GetUserProfile = {
     updatedAt: Date | null;
 }
 
-export const getUserProfile = () => fetcher("/me")
+export const getUserProfile = () => fetcher<GetUserProfile>("/me")

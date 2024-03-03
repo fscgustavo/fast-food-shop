@@ -3,11 +3,8 @@ import { useRouter } from "next/navigation";
 import useSWRImmutable from "swr/immutable";
 import useSWRMutation from "swr/mutation";
 
-import {
-	GetManagedRestaurant,
-	getManagedRestaurant,
-} from "@/api/get-managed-restaurant";
-import { GetUserProfile, getUserProfile } from "@/api/get-profile";
+import { getManagedRestaurant } from "@/api/get-managed-restaurant";
+import { getUserProfile } from "@/api/get-profile";
 import { signOut } from "@/api/sign-out";
 
 import { StoreProfileDIalog } from "./store-profile-dialog";
@@ -26,14 +23,13 @@ import { Skeleton } from "./ui/skeleton";
 export function AccountMenu() {
 	const router = useRouter();
 
-	const { data: profile, isLoading: isLoadingProfile } =
-		useSWRImmutable<GetUserProfile>("/me", getUserProfile);
+	const { data: profile, isLoading: isLoadingProfile } = useSWRImmutable(
+		"/me",
+		getUserProfile
+	);
 
 	const { data: managedRestaurant, isLoading: isLoadingRestaurant } =
-		useSWRImmutable<GetManagedRestaurant>(
-			"/managed-restaurant",
-			getManagedRestaurant
-		);
+		useSWRImmutable("/managed-restaurant", getManagedRestaurant);
 
 	const { trigger: signOutFn, isMutating: isSigningOut } = useSWRMutation(
 		"sign-in",
@@ -56,7 +52,7 @@ export function AccountMenu() {
 						{isLoadingRestaurant ? (
 							<Skeleton className="h-4 w-40" />
 						) : (
-							managedRestaurant?.name
+							managedRestaurant?.data?.name
 						)}
 						<ChevronDown className="w-4 h-4" />
 					</Button>
@@ -70,9 +66,9 @@ export function AccountMenu() {
 							</div>
 						) : (
 							<>
-								<span>{profile?.name}</span>
+								<span>{profile?.data?.name}</span>
 								<span className="text-xs font-normal text-muted-foreground">
-									{profile?.email}
+									{profile?.data?.email}
 								</span>
 							</>
 						)}

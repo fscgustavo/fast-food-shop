@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import { z } from "zod";
 
-import { getOrders, GetOrdersResponse } from "@/api/get-orders";
+import { getOrders } from "@/api/get-orders";
 import { Pagination } from "@/components/pagination";
 import {
 	Table,
@@ -21,22 +21,32 @@ export function OrderTable() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
+	const orderId = searchParams.get("orderId");
+	const customerName = searchParams.get("customerName");
+	const status = searchParams.get("status");
+
 	const currentPageIndex = z.coerce
 		.number()
 		.transform((page) => page - 1)
 		.parse(searchParams.get("page") ?? 1);
 
-	const { data: result } = useSWR<GetOrdersResponse>(
-		`/orders?pageIndex=${currentPageIndex}`,
-		() => getOrders({ pageIndex: currentPageIndex })
+	const { data: result } = useSWR(
+		["orders", currentPageIndex, orderId, customerName, status],
+		() =>
+			getOrders({
+				pageIndex: currentPageIndex.toString(),
+				orderId,
+				customerName,
+				status,
+			})
 	);
 
 	function handlePaginate(pageIndex: number) {
-		const searchParams = new URLSearchParams();
+		const newSearchParams = new URLSearchParams(searchParams.toString());
 
-		searchParams.set("page", String(pageIndex + 1));
+		newSearchParams.set("page", String(pageIndex + 1));
 
-		router.push(`/orders?${searchParams.toString()}`);
+		router.push(`/orders?${newSearchParams.toString()}`);
 	}
 
 	return (
@@ -57,18 +67,18 @@ export function OrderTable() {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{result?.orders.map((order, i) => {
+						{result?.data?.orders.map((order, i) => {
 							return <OrderTableRow order={order} key={i} />;
 						})}
 					</TableBody>
 				</Table>
 			</div>
-			{result && (
+			{result?.data && (
 				<Pagination
 					onPageChange={handlePaginate}
-					pageIndex={result.meta.pageIndex}
-					totalCount={result.meta.totalCount}
-					perPage={result.meta.perPage}
+					pageIndex={result.data.meta.pageIndex}
+					totalCount={result.data.meta.totalCount}
+					perPage={result.data.meta.perPage}
 				/>
 			)}
 		</div>

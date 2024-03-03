@@ -8,4 +8,4 @@ export type GetManagedRestaurant = {
     description: string | null;
     managerId: string | null;
 }
-export const getManagedRestaurant = () => fetcher("/managed-restaurant")
+export const getManagedRestaurant = () => fetcher<GetManagedRestaurant>("/managed-restaurant")

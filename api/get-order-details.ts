@@ -25,5 +25,5 @@ export type GetOrderDetailsResponse = {
 }
 
 export function getOrderDetails({ orderId }: GetOrderDetailsParams) {
-    return fetcher(`/orders/${orderId}`)
+    return fetcher<GetOrderDetailsResponse>(`/orders/${orderId}`)
 }

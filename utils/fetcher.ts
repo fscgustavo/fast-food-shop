@@ -1,9 +1,5 @@
 import { env } from "@/env"
 
-
-
-
-
 // eslint-disable-next-line no-undef
 type Config = RequestInit & {
     method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -14,7 +10,7 @@ type Request = Omit<Config, 'body'> & {
 };
 
 
-export function fetcher(endpoint: string, { body, ...customConfig }: Request = {}) {
+export function fetcher<T = unknown>(endpoint: string, { body, ...customConfig }: Request = {}) {
     const headers = { 'content-type': 'application/json' }
 
     let config: Config = {
@@ -35,14 +31,13 @@ export function fetcher(endpoint: string, { body, ...customConfig }: Request = {
     }
 
 
-    return window
-        .fetch(`${env.NEXT_PUBLIC_DOMAIN}${endpoint}`, config)
+    return fetch(`${env.NEXT_PUBLIC_DOMAIN}${endpoint}`, config)
         .then(async response => {
             if (response.ok) {
                 try {
-                    return await response.json()
+                    return { data: await response.json() as T }
                 } catch {
-                    return null
+                    return { data: null }
                 }
             } else {
                 const errorMessage = await response.text()

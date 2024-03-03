@@ -2,7 +2,10 @@ import { formatDistanceToNow } from "date-fns";
 import { enUS } from "date-fns/locale";
 import { ArrowRight, Search, X } from "lucide-react";
 import { useState } from "react";
+import { mutate } from "swr";
+import useSWRMutation from "swr/mutation";
 
+import { cancelOrder } from "@/api/cancel-order";
 import { Order } from "@/api/get-orders";
 import { OrderDetails } from "@/app/(main)/orders/order-details";
 import { Button } from "@/components/ui/button";
@@ -17,6 +20,19 @@ type OrderTableRowProps = {
 
 export function OrderTableRow({ order }: OrderTableRowProps) {
 	const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
+	const isCancelDisabled = !["pending", "processing"].includes(order.status);
+
+	const { trigger: cancelOrderFn, isMutating: isCancellationLoading } =
+		useSWRMutation("orders", () => cancelOrder({ orderId: order.orderId }), {
+			onSuccess: () => {
+				mutate((key) => key && key[0].startsWith("orders"));
+			},
+		});
+
+	async function handleCancelClick() {
+		await cancelOrderFn().catch(() => null);
+	}
 
 	return (
 		<TableRow>
@@ -59,7 +75,12 @@ export function OrderTableRow({ order }: OrderTableRowProps) {
 				</Button>
 			</TableCell>
 			<TableCell>
-				<Button variant="ghost" size="xs">
+				<Button
+					variant="ghost"
+					size="xs"
+					onClick={handleCancelClick}
+					disabled={isCancelDisabled || isCancellationLoading}
+				>
 					<X className="h-3 w-3 mr-2" />
 					Cancelar
 				</Button>

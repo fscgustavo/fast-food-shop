@@ -3,10 +3,7 @@ import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import useSWRImmutable from "swr/immutable";
 
-import {
-	GetManagedRestaurant,
-	getManagedRestaurant,
-} from "@/api/get-managed-restaurant";
+import { getManagedRestaurant } from "@/api/get-managed-restaurant";
 import { updateProfile } from "@/app/(main)/dashboard/actions";
 
 import { Button } from "./ui/button";
@@ -27,7 +24,7 @@ export function StoreProfileDIalog() {
 
 	const { pending: isUpdatingProfile } = useFormStatus();
 
-	const { data: managedRestaurant } = useSWRImmutable<GetManagedRestaurant>(
+	const { data: managedRestaurant } = useSWRImmutable(
 		"/managed-restaurant",
 		getManagedRestaurant
 	);
@@ -72,7 +69,7 @@ export function StoreProfileDIalog() {
 							className="col-span-3"
 							id="name"
 							name="name"
-							defaultValue={managedRestaurant?.name ?? ""}
+							defaultValue={managedRestaurant?.data?.name ?? ""}
 						/>
 					</div>
 					<div className="grid grid-cols-4 items-center gap-4">
@@ -83,7 +80,7 @@ export function StoreProfileDIalog() {
 							className="col-span-3"
 							id="description"
 							name="description"
-							defaultValue={managedRestaurant?.description ?? ""}
+							defaultValue={managedRestaurant?.data?.description ?? ""}
 							rows={6}
 						/>
 					</div>

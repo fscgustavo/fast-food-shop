@@ -2,10 +2,7 @@ import { formatDistanceToNow } from "date-fns";
 import { enUS } from "date-fns/locale";
 import useSWR from "swr";
 
-import {
-	getOrderDetails,
-	GetOrderDetailsResponse,
-} from "@/api/get-order-details";
+import { getOrderDetails } from "@/api/get-order-details";
 import {
 	DialogContent,
 	DialogDescription,
@@ -30,12 +27,11 @@ type OrderDetailsProps = {
 };
 
 export function OrderDetails({ id, open }: OrderDetailsProps) {
-	const { data: details } = useSWR<GetOrderDetailsResponse>(
-		open ? `/orders/${id}` : null,
-		() => getOrderDetails({ orderId: id })
+	const { data: details } = useSWR(open ? `/orders/${id}` : null, () =>
+		getOrderDetails({ orderId: id })
 	);
 
-	const totalPrice = details?.totalInCents ?? 0 / 100;
+	const totalPrice = details?.data?.totalInCents ?? 0 / 100;
 
 	return (
 		<DialogContent>
@@ -43,20 +39,20 @@ export function OrderDetails({ id, open }: OrderDetailsProps) {
 				<DialogTitle>Order: {id}</DialogTitle>
 				<DialogDescription>Order Details</DialogDescription>
 			</DialogHeader>
-			{!details ? null : (
+			{!details?.data ? null : (
 				<div className="space-y-6">
 					<Table>
 						<TableBody>
 							<TableRow>
 								<TableCell className="text-muted-foreground">Status</TableCell>
 								<TableCell className="flex justify-end">
-									<OrderStatus status={details.status} />
+									<OrderStatus status={details.data.status} />
 								</TableCell>
 							</TableRow>
 							<TableRow>
 								<TableCell className="text-muted-foreground">Client</TableCell>
 								<TableCell className="flex justify-end">
-									{details.customer.name}
+									{details.data.customer.name}
 								</TableCell>
 							</TableRow>
 							<TableRow>
@@ -64,20 +60,20 @@ export function OrderDetails({ id, open }: OrderDetailsProps) {
 									Cellphone
 								</TableCell>
 								<TableCell className="flex justify-end">
-									{details.customer.phone ?? "Not informed"}
+									{details.data.customer.phone ?? "Not informed"}
 								</TableCell>
 							</TableRow>
 							<TableRow>
 								<TableCell className="text-muted-foreground">E-mail</TableCell>
 								<TableCell className="flex justify-end">
-									{details.customer.email}
+									{details.data.customer.email}
 								</TableCell>
 							</TableRow>
 							<TableRow>
 								<TableCell className="text-muted-foreground">Done</TableCell>
 								<TableCell className="flex justify-end">
-									{details.createdAt
-										? formatDistanceToNow(details.createdAt, {
+									{details.data.createdAt
+										? formatDistanceToNow(details.data.createdAt, {
 												locale: enUS,
 												addSuffix: true,
 											})
@@ -96,7 +92,7 @@ export function OrderDetails({ id, open }: OrderDetailsProps) {
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{details.orderItems.map((item) => {
+							{details.data.orderItems.map((item) => {
 								const prices = {
 									unity: item.priceInCents / 100,
 									product: (item.priceInCents * item.quantity) / 100,

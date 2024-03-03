@@ -1,8 +1,6 @@
 import { fetcher } from "@/utils/fetcher";
 
-export type GetOrdersQuery = {
-    pageIndex?: number | null
-}
+
 
 export type Order = {
     orderId: string;
@@ -10,6 +8,13 @@ export type Order = {
     status: "pending" | "canceled" | "processing" | "delivering" | "delivered";
     customerName: string;
     total: number;
+}
+
+export type GetOrdersQuery = {
+    pageIndex?: string | null
+    orderId: Order['orderId'] | null
+    status: string | null
+    customerName: Order['customerName'] | null
 }
 
 export type GetOrdersResponse = {
@@ -21,6 +26,15 @@ export type GetOrdersResponse = {
     };
 }
 
-export function getOrders({ pageIndex }: GetOrdersQuery) {
-    return fetcher(`/orders?pageIndex=${pageIndex}`)
+export function getOrders(queries: GetOrdersQuery) {
+    const searchParams = new URLSearchParams()
+
+    queries.pageIndex && searchParams.set("pageIndex", queries.pageIndex)
+    queries.orderId && searchParams.set("orderId", queries.orderId)
+    queries.status && searchParams.set("status", queries.status)
+    queries.customerName && searchParams.set("customerName", queries.customerName)
+
+    const searchParamsString = searchParams.toString() ? `?${searchParams.toString()}` : ''
+
+    return fetcher<GetOrdersResponse>(`/orders${searchParamsString}`)
 }
